@@ -1,0 +1,2 @@
+# logCollector
+Distributed log collector
