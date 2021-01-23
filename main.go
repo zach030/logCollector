@@ -36,12 +36,13 @@ func main() {
 	}
 	logrus.Info("[Kafka]------init kafka success!")
 	// 从etcd中拉取要收集的日志的配置项
+	// 需要监控etcd中config的变化
 	err = etcd.Init([]string{configObj.EtcdConfig.Address})
 	if err != nil {
 		logrus.Errorf("[Error]-----init etcd failed,err:%v\n", err)
 		return
 	}
-	allConfs,err := etcd.GetConf(configObj.EtcdConfig.CollectKey)
+	allConfs, err := etcd.GetConf(configObj.EtcdConfig.CollectKey)
 	if err != nil {
 		logrus.Errorf("[Error]-----get conf from etcd failed,err:%v\n", err)
 		return
@@ -52,7 +53,6 @@ func main() {
 		logrus.Errorf("[Error]-----start tail collect client failed,err:%v\n", err)
 		return
 	}
-	select {
-
-	}
+	go etcd.WatchConf(configObj.EtcdConfig.CollectKey)
+	select {}
 }

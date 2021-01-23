@@ -5,7 +5,6 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/nxadm/tail"
 	"github.com/sirupsen/logrus"
-	"logAgent/common"
 	"logAgent/kafka"
 	"strings"
 	"time"
@@ -54,22 +53,11 @@ func (t *tailTask) run() {
 		fmt.Println("msg is:", line.Text)
 		// 将读出来的一行日志 包装成kafka的msg，放入通道
 		msg := &sarama.ProducerMessage{
-			Topic:     t.Topic,
-			Value:     sarama.StringEncoder(line.Text),
+			Topic: t.Topic,
+			Value: sarama.StringEncoder(line.Text),
 		}
 		kafka.Send2MsgChan(msg)
 	}
 }
 
-func Init(allConfs []*common.CollectEntry) (err error) {
-	for _, conf := range allConfs {
-		tt, err := NewTailTask(conf.Path, conf.Topic)
-		if err != nil {
-			logrus.Errorf("new tail obj for path:%s, topic:%s, failed", conf.Path, conf.Topic)
-			continue
-		}
-		logrus.Infof("create a tail task for path:%s, topic:%s", conf.Path, conf.Topic)
-		go tt.run()
-	}
-	return
-}
+
