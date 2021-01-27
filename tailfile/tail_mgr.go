@@ -51,7 +51,23 @@ func (t *TailTaskMgr) Watch() {
 				continue
 			}
 			t.TailTaskMap[conf.Path] = tt
-			// 原来有，现在无：需删除
+			go tt.run()
+		}
+		// 找出原来有，现在无：需删除
+		for key, task := range t.TailTaskMap {
+			var found bool
+			for _, conf := range newConf {
+				if key == conf.Path {
+					found = true
+					break
+				}
+			}
+			if !found {
+				logrus.Infof("collect task path:%s is stop", task.Path)
+				// task not exist now
+				delete(t.TailTaskMap, key)
+				task.cancel()
+			}
 		}
 	}
 }

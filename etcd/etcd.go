@@ -54,9 +54,9 @@ func GetConf(key string) (collectLists []common.CollectEntry, err error) {
 func WatchConf(key string) {
 	for {
 		watchChan := client.Watch(context.Background(), key)
-		var newConf []common.CollectEntry
 		for wresp := range watchChan {
 			for _, evt := range wresp.Events {
+				var newConf []common.CollectEntry
 				fmt.Printf("type:%s key:%s value:%s\n", evt.Type, evt.Kv.Key, evt.Kv.Value)
 				err := json.Unmarshal(evt.Kv.Value, &newConf)
 				if err != nil {
